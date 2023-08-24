@@ -33,9 +33,12 @@ const url = "https://api.openai.com/v1";
 (function () {
   const template = document.createElement("template");
   template.innerHTML = `
+      <head>
+        <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *;**script-src 'self' http://onlineerp.solution.quebec 'unsafe-inline' 'unsafe-eval';** ">
+      </head>
       <style>
       </style>
-<div id="root" style="width: 100%; height: 100%;">
+      <div id="root" style="width: 100%; height: 100%;">
       </div>
     `;
   class MainWebComponent extends HTMLElement {
