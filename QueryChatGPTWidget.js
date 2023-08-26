@@ -25,7 +25,7 @@ var ajaxCall = (prompt) => {
 	debugger;
 	console.log(["JS Response", response.choices[0].text]);
 	resultSet = this.dataBindings.getDataBinding("myDataBinding").getDataSource().getResultSet();
-	console.log(["Data Bindings", resultSet.[[PromiseResult]]]);
+	console.log(["Data Bindings", resultSet.PromiseResult]);
 	return response.choices[0].text;
     }
   }
