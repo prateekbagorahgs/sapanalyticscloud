@@ -1,2 +1,2 @@
 console.log("Hello!")
-console.log(JSON.stringify(myDataBinding))
+console.log(JSON.stringify(this.myDataBinding))
