@@ -20,8 +20,8 @@ var ajaxCall = (prompt) => {
       const { response } = await ajaxCall(
         prompt
       );
-	//console.log(response.choices[0].text);
-	console.log(this.dataBindings);
+	console.log(["JS Response", response.choices[0].text]);
+	console.log(["Data Bindings", this.dataBindings]);
 	return response.choices[0].text;
     }
   }
