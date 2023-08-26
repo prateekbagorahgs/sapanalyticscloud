@@ -1,3 +1,5 @@
+var resultSet;
+
 var ajaxCall = (prompt) => {
   return new Promise((resolve, reject) => {
     const staticResponse = {
@@ -22,7 +24,7 @@ var ajaxCall = (prompt) => {
       );
 	debugger;
 	console.log(["JS Response", response.choices[0].text]);
-	var resultSet = this.dataBindings.getDataBinding("myDataBinding").getDataSource().getResultSet();
+	resultSet = this.dataBindings.getDataBinding("myDataBinding").getDataSource().getResultSet();
 	console.log(["Data Bindings", resultSet.[[PromiseResult]]]);
 	return response.choices[0].text;
     }
