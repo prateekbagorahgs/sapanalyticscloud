@@ -5,7 +5,7 @@ var ajaxCall = (key, url, prompt) => {
       type: "POST",
       dataType: "json",
       data: JSON.stringify({
-        model: "gpt-3.5-turbo",
+        model: "gpt-3.5-turbo-0613",
         prompt: prompt,
         max_tokens: 1024,
         n: 1,
@@ -40,13 +40,14 @@ const url = "https://api.openai.com/v1";
     `;
   class MainWebComponent extends HTMLElement {
     async post(apiKey, endpoint, prompt) {
+      const prompt = JSON.parse(jsonString);
       const { response } = await ajaxCall(
         apiKey,
         `${url}/${endpoint}`,
         prompt
       );
       console.log(response);
-      return response.choices[0].text;
+      return response.choices[0].message.content;
     }
   }
   customElements.define("chatgpt-widget", MainWebComponent);
