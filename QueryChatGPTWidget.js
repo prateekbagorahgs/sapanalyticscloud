@@ -20,7 +20,7 @@ var ajaxCall = (prompt) => {
       const { response } = await ajaxCall(
         prompt
       );
-      console.log(response);
+//      console.log(response);
 //      return response.text;
     }
   }
