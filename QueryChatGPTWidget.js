@@ -20,8 +20,8 @@ var ajaxCall = (prompt) => {
       const { response } = await ajaxCall(
         prompt
       );
-	console.log(response);
-	return response.choices[0].text;
+	// console.log(response);
+	// return response.choices[0].text;
     }
   }
   customElements.define("query-chatgpt-widget", MainWebComponent);
