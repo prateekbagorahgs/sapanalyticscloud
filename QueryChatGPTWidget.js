@@ -21,7 +21,7 @@ var ajaxCall = (prompt) => {
         prompt
       );
       console.log(response);
-      return response.text;
+//      return response.text;
     }
   }
   customElements.define("query-chatgpt-widget", MainWebComponent);
