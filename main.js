@@ -41,7 +41,7 @@ const url = "https://api.openai.com/v1";
   class MainWebComponent extends HTMLElement {
     async post(apiKey, endpoint, prompt) {
       const regex = new RegExp("\\n", "g");
-      const messages = JSON.parse(prompt.replace(regex, "\\\\\\n"));
+      const messages = JSON.parse(prompt[0].replace(regex, "\\\\\\n"));
       const { response } = await ajaxCall(
         apiKey,
         `${url}/${endpoint}`,
