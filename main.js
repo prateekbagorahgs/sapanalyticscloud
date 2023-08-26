@@ -57,7 +57,7 @@ const url = "https://api.openai.com/v1";
       const { response } = await ajaxCall(
         apiKey,
         `${url}/${endpoint}`,
-        messages
+        messageArray
       );
       console.log(response);
       return response.choices[0].message.content;
