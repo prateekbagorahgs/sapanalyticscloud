@@ -21,7 +21,7 @@ var ajaxCall = (prompt) => {
         prompt
       );
 	//console.log(response.choices[0].text);
-	//console.log(this.dataBindings[0].text);
+	console.log(this.dataBindings);
 	return response.choices[0].text;
     }
   }
