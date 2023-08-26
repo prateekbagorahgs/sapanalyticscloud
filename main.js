@@ -41,8 +41,19 @@ const url = "https://api.openai.com/v1";
   class MainWebComponent extends HTMLElement {
     async post(apiKey, endpoint, prompt) {
       const regex = new RegExp("\\n", "g");
-      const messages = JSON.parse(prompt[0].replace(regex, "\\\\n"));
-      console.log(["messages",messages]);
+      const messageArray = [];
+
+      for (const promptString of prompt) {
+      try {
+        const messageObject = JSON.parse(promptString.replace(regex, "\\\\n"));
+        messageArray.push(messageObject);
+        } catch (error) {
+        console.error('Error parsing Prompt JSON:', error);
+        }
+      }
+      
+      console.log(["messages",messageArray]);
+
       const { response } = await ajaxCall(
         apiKey,
         `${url}/${endpoint}`,
