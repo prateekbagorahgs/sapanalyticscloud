@@ -41,9 +41,15 @@ const url = "https://api.openai.com/v1";
   class MainWebComponent extends HTMLElement {
     async post(apiKey, endpoint, prompt) {
 
-      const resultSet = this.dataBindings.getDataBinding("myDataBinding").getDataSource().getResultSet();
-      console.log(resultSet);
-      
+      let resultSet;
+      try {
+        const resultSet = await this.dataBindings.getDataBinding("myDataBinding").getDataSource().getResultSet();
+        }
+        catch (error) {
+          console.error('Error in Data Binding:', error);
+          }
+      console.log(["resultSet", resultSet]);
+
       const regex = new RegExp("\\n", "g");
       const messageArray = [];
 
