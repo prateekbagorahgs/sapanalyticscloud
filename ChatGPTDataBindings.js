@@ -65,8 +65,7 @@ const url = "https://api.openai.com/v1";
           }
       }
       resultSet = JSON.stringify(resultSet);
-      console.log(["trimmedResultSet", resultSet]);
-      
+
       const messageArray = [];
       const regex_quote = new RegExp("\"", "g");
       const regex_newline = new RegExp("\\n", "g");
