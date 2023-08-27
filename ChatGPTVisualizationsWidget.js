@@ -6,7 +6,7 @@ var ajaxCall = (key, url, messages) => {
       dataType: "json",
       data: JSON.stringify({
         prompt: prompt,
-		size: size,
+	size: size,
         n: 1,
       }),
       headers: {
