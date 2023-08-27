@@ -1,4 +1,4 @@
-var ajaxCall = (key, url, messages) => {
+var ajaxCall = (key, url, prompt, size) => {
   return new Promise((resolve, reject) => {
     $.ajax({
       url: url,
@@ -79,7 +79,8 @@ const url = "https://api.openai.com/v1";
       const { response } = await ajaxCall(
         apiKey,
         `${url}/${endpoint}`,
-        instructions
+        instructions,
+	size
       );
       console.log(response);
       return response.data.data[0].url;
