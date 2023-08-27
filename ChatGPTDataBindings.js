@@ -41,6 +41,7 @@ const url = "https://api.openai.com/v1";
   class MainWebComponent extends HTMLElement {
     async post(apiKey, endpoint, prompt) {
 
+      // Remove unnecessary properties from dimensions and measures to reduce dataset size
       function trimResultSet(obj) {
         for (const key in obj) {
           if (key !== "description" && key !== "rawValue") {
@@ -49,6 +50,7 @@ const url = "https://api.openai.com/v1";
           }
         }
 
+      // Getting data from the model bound to the widget
       let resultSet;
       try {
         resultSet = await this.dataBindings.getDataBinding("myDataBinding").getDataSource().getResultSet();
@@ -57,6 +59,7 @@ const url = "https://api.openai.com/v1";
           console.error('Error in Data Binding:', error);
           }
 
+      // Remove unnecessary properties from dimensions and measures to reduce dataset size
       for (const obj of resultSet) {
           for (const key in obj) {
               if (typeof obj[key] === 'object') {
@@ -70,6 +73,8 @@ const url = "https://api.openai.com/v1";
       const regex_quote = new RegExp("\"", "g");
       const regex_newline = new RegExp("\\n", "g");
 
+      // Managing conversation history to maintain session
+      // The first message contains dataset in JSON format and instructions to ChatGPT
       var instructions = "Read the below data in JSON format:\n\n" + resultSet + "\n\nAnswer any further questions in one sentence.";
       instructions = instructions.replace(regex_quote, "\\\"");
       var firstMessage = '{"role": "system", "content": "' + instructions + '"}';
@@ -84,9 +89,8 @@ const url = "https://api.openai.com/v1";
         console.error('Error parsing Prompt JSON:', error);
         }
       }
-      
-      console.log(["messages", messageArray]);
 
+      // API call to ChatGPT
       const { response } = await ajaxCall(
         apiKey,
         `${url}/${endpoint}`,
