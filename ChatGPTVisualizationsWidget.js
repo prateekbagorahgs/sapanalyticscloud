@@ -85,5 +85,5 @@ const url = "https://api.openai.com/v1";
       return response.data.data[0].url;
     }
   }
-  customElements.define("chatgpt-databindings-widget", MainWebComponent);
+  customElements.define("chatgpt-visualizations-widget", MainWebComponent);
 })();
