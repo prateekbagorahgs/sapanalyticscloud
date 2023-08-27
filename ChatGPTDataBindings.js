@@ -43,7 +43,7 @@ const url = "https://api.openai.com/v1";
 
       let resultSet;
       try {
-        const resultSet = await this.dataBindings.getDataBinding("myDataBinding").getDataSource().getResultSet();
+        resultSet = await this.dataBindings.getDataBinding("myDataBinding").getDataSource().getResultSet();
         }
         catch (error) {
           console.error('Error in Data Binding:', error);
