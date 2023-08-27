@@ -56,8 +56,7 @@ const url = "https://api.openai.com/v1";
         catch (error) {
           console.error('Error in Data Binding:', error);
           }
-      console.log(["resultSet", resultSet]);
-      
+
       for (const obj of resultSet) {
           for (const key in obj) {
               if (typeof obj[key] === 'object') {
@@ -65,21 +64,27 @@ const url = "https://api.openai.com/v1";
               }
           }
       }
-      console.log(["trimmedResultSet", JSON.stringify(resultSet)]);
       
-      const regex = new RegExp("\\n", "g");
       const messageArray = [];
+      const regex_quote = new RegExp("\"", "g");
+      const regex_newline = new RegExp("\\n", "g");
+
+      var instructions = "Read the below data in JSON format:\n\n" + resultSet + "\n\nAnswer any further questions in one sentence.";
+      instructions = instructions.replace(regex_quote, "\\\"");
+      var firstMessage = '{"role": "system", "content": "' + instructions + '"}';
+      const messageObject = JSON.parse(firstMessage.replace(regex_newline, "\\\\n"));
+      messageArray.push(messageObject);
 
       for (const promptString of prompt) {
       try {
-        const messageObject = JSON.parse(promptString.replace(regex, "\\\\n"));
+        const messageObject = JSON.parse(promptString.replace(regex_newline, "\\\\n"));
         messageArray.push(messageObject);
         } catch (error) {
         console.error('Error parsing Prompt JSON:', error);
         }
       }
       
-      console.log(["messages",messageArray]);
+      console.log(["messages", messageArray]);
 
       const { response } = await ajaxCall(
         apiKey,
