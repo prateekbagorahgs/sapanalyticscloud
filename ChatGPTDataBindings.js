@@ -41,6 +41,14 @@ const url = "https://api.openai.com/v1";
   class MainWebComponent extends HTMLElement {
     async post(apiKey, endpoint, prompt) {
 
+      function trimResultSet(obj) {
+        for (const key in obj) {
+          if (key !== "description" && key !== "rawValue") {
+            delete obj[key];
+            }
+          }
+        }
+
       let resultSet;
       try {
         resultSet = await this.dataBindings.getDataBinding("myDataBinding").getDataSource().getResultSet();
@@ -49,7 +57,16 @@ const url = "https://api.openai.com/v1";
           console.error('Error in Data Binding:', error);
           }
       console.log(["resultSet", resultSet]);
-
+      
+      for (const obj of resultSet) {
+          for (const key in obj) {
+              if (typeof obj[key] === 'object') {
+                  trimResultSet(obj[key]);
+              }
+          }
+      }
+      console.log(["trimmedResultSet", JSON.stringify(resultSet)]);
+      
       const regex = new RegExp("\\n", "g");
       const messageArray = [];
 
