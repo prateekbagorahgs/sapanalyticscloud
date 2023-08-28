@@ -112,7 +112,9 @@ const url = "https://api.openai.com/v1";
         messageArray
       );
       console.log(response);
-      return response.choices[0].message.content;
+      const output = response.choices[0].message.content.replace(/["']/g, '');
+      console.log(output);
+      return output;
     }
   }
   customElements.define("chatgpt-databindings-widget", MainWebComponent);
