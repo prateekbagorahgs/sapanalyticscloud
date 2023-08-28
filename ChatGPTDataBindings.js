@@ -8,7 +8,7 @@ var ajaxCall = (key, url, messages) => {
         // model: "gpt-3.5-turbo-0613",
         // max_tokens: 1024,
         model: "gpt-4",
-        max_tokens: 2048,
+        max_tokens: 4096,
         messages: messages,
         n: 1,
         temperature: 0.5,
