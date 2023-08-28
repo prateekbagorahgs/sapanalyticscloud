@@ -41,7 +41,7 @@ const url = "https://api.openai.com/v1";
   class MainWebComponent extends HTMLElement {
     async post(apiKey, endpoint, prompt) {
 
-      // Remove unnecessary properties from dimensions and measures to reduce dataset size
+      // Function to remove unnecessary properties from dimensions and measures to reduce dataset size
       function trimResultSet(obj) {
         for (const key in obj) {
           if (key !== "description" && key !== "rawValue") {
