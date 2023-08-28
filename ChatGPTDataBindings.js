@@ -49,46 +49,61 @@ const url = "https://api.openai.com/v1";
             }
           }
         }
-
-      // Getting data from the model bound to the widget
-      let resultSet;
-      try {
-        resultSet = await this.dataBindings.getDataBinding("myDataBinding").getDataSource().getResultSet();
-        }
-        catch (error) {
-          console.error('Error in Data Binding:', error);
-          }
-
-      // Remove unnecessary properties from dimensions and measures to reduce dataset size
-      for (const obj of resultSet) {
-          for (const key in obj) {
-              if (typeof obj[key] === 'object') {
-                  trimResultSet(obj[key]);
+      
+      // Function for getting data from the model bound to the widget
+      async function fetchResultSet() {
+        try {
+          let resultSet;
+          resultSet = await this.dataBindings.getDataBinding("myDataBinding").getDataSource().getResultSet();
+          console.log(["resultSet 1", resultSet]);
+          
+          // Remove unnecessary properties from dimensions and measures to reduce dataset size
+          for (const obj of resultSet) {
+              for (const key in obj) {
+                  if (typeof obj[key] === 'object') {
+                      trimResultSet(obj[key]);
+                  }
               }
           }
-      }
-      resultSet = JSON.stringify(resultSet);
+          resultSet = JSON.stringify(resultSet);
+          console.log(["resultSet 2", resultSet]);
+          
+          let messageArray = [];
+          console.log(["messageArray empty", messageArray]);
+          
+          const regex_quote = new RegExp("\"", "g");
+          const regex_newline = new RegExp("\\n", "g");
+    
+          // Managing conversation history to maintain session
+          // The first message contains dataset in JSON format and instructions to ChatGPT
+          var instructions = "Read the below data in JSON format:\n\n" + resultSet + "\n\nAnswer any further questions in one sentence.";
+          instructions = instructions.replace(regex_quote, "\\\"");
+          var firstMessage = '{"role": "system", "content": "' + instructions + '"}';
+          const messageObject = JSON.parse(firstMessage.replace(regex_newline, "\\\\n"));
+          console.log(["messageObject", messageObject]);
+          
+          messageArray.push(messageObject);
+          console.log(["messageArray 1", messageArray]);
+          
+          for (const promptString of prompt) {
+            try {
+              const messageObject = JSON.parse(promptString.replace(regex_newline, "\\\\n"));
+              messageArray.push(messageObject);
+              } catch (error) {
+              console.error('Error parsing Prompt JSON:', error);
+              }
+            }
+          console.log(["messageArray 2", messageArray]);
+          return messageArray;
 
-      const messageArray = [];
-      const regex_quote = new RegExp("\"", "g");
-      const regex_newline = new RegExp("\\n", "g");
-
-      // Managing conversation history to maintain session
-      // The first message contains dataset in JSON format and instructions to ChatGPT
-      var instructions = "Read the below data in JSON format:\n\n" + resultSet + "\n\nAnswer any further questions in one sentence.";
-      instructions = instructions.replace(regex_quote, "\\\"");
-      var firstMessage = '{"role": "system", "content": "' + instructions + '"}';
-      const messageObject = JSON.parse(firstMessage.replace(regex_newline, "\\\\n"));
-      messageArray.push(messageObject);
-
-      for (const promptString of prompt) {
-      try {
-        const messageObject = JSON.parse(promptString.replace(regex_newline, "\\\\n"));
-        messageArray.push(messageObject);
-        } catch (error) {
-        console.error('Error parsing Prompt JSON:', error);
+          } catch (error) {
+          console.error('Error in Data Binding:', error);
+          }
         }
-      }
+
+      // Getting data from the model bound to the widget
+      const messageArray = await fetchResultSet.call(this);
+      console.log("messageArray 3", messageArray);
 
       // API call to ChatGPT
       const { response } = await ajaxCall(
