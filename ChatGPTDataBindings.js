@@ -11,7 +11,7 @@ var ajaxCall = (key, url, messages) => {
         max_tokens: 4096,
         messages: messages,
         n: 1,
-        temperature: 0.5,
+        temperature: 0.3,
       }),
       headers: {
         "Content-Type": "application/json",
