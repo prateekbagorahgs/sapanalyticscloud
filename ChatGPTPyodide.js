@@ -71,7 +71,7 @@ const url = "https://api.openai.com/v1";
     }
 
     // Function to remove unnecessary properties from dimensions and measures to reduce dataset size
-    function trimResultSet(obj) {
+    trimResultSet(obj) {
       for (const key in obj) {
         if (key !== "description" && key !== "rawValue") {
           delete obj[key];
@@ -80,9 +80,9 @@ const url = "https://api.openai.com/v1";
       }
 
     // Function for getting data from the model bound to the widget
-    async function fetchResultSet() {
+    async fetchResultSet() {
       try {
-        resultSet = await this.dataBindings.getDataBinding("myDataBinding").getDataSource().getResultSet();
+        var resultSet = await this.dataBindings.getDataBinding("myDataBinding").getDataSource().getResultSet();
         
         // Remove unnecessary properties from dimensions and measures to reduce dataset size
         for (const obj of resultSet) {
@@ -101,7 +101,7 @@ const url = "https://api.openai.com/v1";
       }
     
     // Function for getting data from the model bound to the widget
-    async function prepareMessages() {
+    async prepareMessages() {
       try {
         let messageArray = [];
         
