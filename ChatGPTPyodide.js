@@ -41,8 +41,7 @@ const url = "https://api.openai.com/v1";
       </div>
     `;
   class MainWebComponent extends HTMLElement {
-
-	constructor () {
+    constructor () {
       super();
       this.pyodide = null;
       this.messageArray = null;
