@@ -1,3 +1,9 @@
+var getScriptPromisify = (src) => {
+  return new Promise(resolve => {
+    $.getScript(src, resolve);
+  })
+}
+
 var ajaxCall = (key, url, messages) => {
   return new Promise((resolve, reject) => {
     $.ajax({
