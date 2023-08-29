@@ -51,14 +51,16 @@ const url = "https://api.openai.com/v1";
 
     // Funtion to load pyodide
     async fetchPyodide () {
-      await getScriptPromisify('https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js')
-      const pyodide = await loadPyodide()
-      this.pyodide = pyodide
+      await getScriptPromisify('https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js');
+      const pyodide = await loadPyodide();
+      this.pyodide = pyodide;
+      console.log(["pyodide", this.pyodide]);
     }
 
     // Function to run python code in pyodide
     async runPythonCode(code){
       const codeOutput = await this.pyodide.runPythonAsync(code);
+      console.log(["codeOutput", codeOutput]);
       return codeOutput;
     }
 
@@ -85,6 +87,7 @@ const url = "https://api.openai.com/v1";
             }
         }
         this.resultSet = JSON.stringify(resultSet);
+        console.log(["resultSet", this.resultSet]);
       }
         catch (error) {
           console.error('Error in Fetching Dataset:', error);
