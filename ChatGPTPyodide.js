@@ -1,3 +1,37 @@
+var ajaxCall = (key, url, messages) => {
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      url: url,
+      type: "POST",
+      dataType: "json",
+      data: JSON.stringify({
+        // model: "gpt-3.5-turbo-0613",
+        // max_tokens: 1024,
+        model: "gpt-4",
+        max_tokens: 4096,
+        messages: messages,
+        n: 1,
+        temperature: 0.3,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${key}`,
+      },
+      crossDomain: true,
+      success: function (response, status, xhr) {
+        resolve({ response, status, xhr });
+      },
+      error: function (xhr, status, error) {
+        const err = new Error('xhr error');
+        err.status = xhr.status;
+        reject(err);
+      },
+    });
+  });
+};
+
+const url = "https://api.openai.com/v1";
+
 (function () {
   const template = document.createElement("template");
   template.innerHTML = `
