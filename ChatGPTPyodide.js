@@ -96,7 +96,6 @@ const url = "https://api.openai.com/v1";
                 }
                 resultSet = JSON.stringify(resultSet);
                 return resultSet
-                console.log(["resultSet", resultSet]);
             } catch (error) {
                 console.error('Error in Fetching Dataset:', error);
             }
@@ -127,7 +126,6 @@ const url = "https://api.openai.com/v1";
                     }
                 }
                 return messageArray;
-                console.log(["messageArray", messageArray]);
             } catch (error) {
                 console.error('Error in preparing Messages:', error);
             }
@@ -137,9 +135,7 @@ const url = "https://api.openai.com/v1";
 
             // Getting data from the model bound to the widget
             const resultSet = await this.fetchResultSet();
-            console.log(["resultSet", resultSet]);
             const messageArray = await this.prepareMessages(resultSet, prompt);
-            console.log("messageArray post", messageArray);
 
             // API call to ChatGPT
             const {
@@ -150,9 +146,7 @@ const url = "https://api.openai.com/v1";
                 messageArray
             );
             console.log(response);
-            const output = response.choices[0].message.content.replace(/["']/g, '');
-            console.log(output);
-            return output;
+            return response.choices[0].message.content;
         }
     }
     customElements.define("chatgpt-pyodide-widget", MainWebComponent);
