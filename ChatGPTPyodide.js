@@ -139,6 +139,7 @@ const url = "https://api.openai.com/v1";
             var codePython = "import json;\n";
             codePython = codePython + "json_data = json.loads(resultSet)\n";
             codePython = codePython + "exec(codeChatGPT, globals())\n";
+            codePython = codePython + "print(output)";
             return codePython;
         }
 
