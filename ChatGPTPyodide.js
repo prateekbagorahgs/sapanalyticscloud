@@ -65,13 +65,6 @@ const url = "https://api.openai.com/v1";
             console.log(["pyodide", this.pyodide]);
         }
 
-        // Function to run python code in pyodide
-        async runPythonCode(code) {
-            const codeOutput = await this.pyodide.runPythonAsync(code);
-            console.log(["codeOutput", codeOutput]);
-            return codeOutput;
-        }
-
         // Function to remove unnecessary properties from dimensions and measures to reduce dataset size
         trimResultSet(obj) {
             for (const key in obj) {
@@ -111,7 +104,7 @@ const url = "https://api.openai.com/v1";
 
                 // Managing conversation history to maintain session
                 // The first message contains dataset in JSON format and instructions to ChatGPT
-                var instructions = "You are my laconic assistant. Read the below data in JSON format from SAP Analytics Cloud. Only answer compact python code <code> to determine the answer to further questions with no other text. I will myself pass it to exec(<code>, {'json_data', json.loads(json_data)}), where json_data = " + resultSet + "\n\nStore the final result in variable 'output'.";
+                var instructions = "You are my laconic assistant. Read the below data in JSON format from SAP Analytics Cloud. Only answer compact python code <code> to determine the answer to further questions with no other text. I will myself pass it to exec(<code>, {'json_data', json.loads(json_data)}), where json_data = " + resultSet + "\n\nStore the final result in variable 'output' as a descriptive string understandable to business users.";
                 instructions = instructions.replace(regex_quote, "\\\"");
                 var firstMessage = '{"role": "system", "content": "' + instructions + '"}';
                 const messageObject = JSON.parse(firstMessage.replace(regex_newline, "\\\\n"));
@@ -131,14 +124,31 @@ const url = "https://api.openai.com/v1";
             }
         }
 
-        async fetchExecutableCode(){
+        // Function to create executable pyhton code
+        async fetchExecutableCode() {
+
             var codePython = "import json;\n";
-            codePython = codePython + "json_data = json.loads(\"\"\"resultSet\"\"\")\n";
-            codePython = codePython + "output = None\n";
-            codePython = codePython + "exec(\"\"\"codeChatGPT\"\"\", globals())";
+            codePython = codePython + "json_data = json.loads(resultSet)\n";
+            codePython = codePython + "exec(codeChatGPT, globals())\n";
+            codePython = codePython + "print(output)";
             return codePython;
         }
-        
+
+        // Function to run python code in pyodide
+        async runPythonCode(resultSet, codeChatGPT, codePython) {
+
+            this.pyodide.globals.set("resultSet", resultSet);
+            this.pyodide.globals.set("codeChatGPT", codeChatGPT);
+            this.pyodide.globals.set("output", "");
+
+            try {
+                await this.pyodide.runPythonAsync(codePython);
+            } catch (error) {
+                console.error("Error in pyodide code execution.", error);
+            }
+        }
+
+        // Main function
         async post(apiKey, endpoint, prompt) {
 
             // Getting data from the model bound to the widget
@@ -154,17 +164,12 @@ const url = "https://api.openai.com/v1";
                 messageArray
             );
             const codeChatGPT = response.choices[0].message.content;
-            console.log(["code", codeChatGPT]);
-
-            this.pyodide.globals.set("resultSet", resultSet);
-            this.pyodide.globals.set("messageArray", messageArray);
-
-            const codePython = this.fetchExecutableCode();
-            console.log(codePython);
-            
-            this.runPythonCode(codePython);
+            const codePython = await this.fetchExecutableCode();
+            await this.runPythonCode(resultSet, codeChatGPT, codePython);
             const codeOutput = this.pyodide.globals.get("output");
-            console.log(["codeOutput", codeOutput]);        }
+            console.log(["codeOutput", codeOutput]);
+            return codeOutput;
+        }
     }
     customElements.define("chatgpt-pyodide-widget", MainWebComponent);
 })();
