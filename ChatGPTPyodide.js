@@ -166,8 +166,14 @@ const url = "https://api.openai.com/v1";
                     messageArray
                 );
                 const codeChatGPT = response.choices[0].message.content;
+
+                // Fetch executable python code
                 const codePython = await this.fetchExecutableCode();
+
+                // Execte python code in pyodide
                 await this.runPythonCode(resultSet, codeChatGPT, codePython);
+
+                // Get output from pyodide environment
                 const codeOutput = this.pyodide.globals.get("output");
                 console.log(["codeOutput", codeOutput]);
                 return codeOutput;
