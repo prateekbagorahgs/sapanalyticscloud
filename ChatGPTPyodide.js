@@ -145,8 +145,11 @@ const url = "https://api.openai.com/v1";
                 `${url}/${endpoint}`,
                 messageArray
             );
-            console.log(response);
-            return response.choices[0].message.content;
+            const code = response.choices[0].message.content;
+            console.log(["code", code]);
+            
+            const codeOutput = this.runPythonCode(code);
+            console.log(["codeOutput", codeOutput]);            
         }
     }
     customElements.define("chatgpt-pyodide-widget", MainWebComponent);
