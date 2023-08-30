@@ -11,9 +11,9 @@ var ajaxCall = (key, url, messages) => {
             type: "POST",
             dataType: "json",
             data: JSON.stringify({
-                // model: "gpt-4",
-                // max_tokens: 4096,
-                model: "gpt-3.5-turbo",
+                // model: "gpt-3.5-turbo",
+                // max_tokens: 1024,
+                model: "gpt-4",
                 max_tokens: 1024,
                 messages: messages,
                 n: 1,
@@ -141,7 +141,6 @@ const url = "https://api.openai.com/v1";
         async runPythonCode(resultSet, codeChatGPT, codePython) {
             this.pyodide.globals.set("resultSet", resultSet);
             this.pyodide.globals.set("codeChatGPT", codeChatGPT);
-            this.pyodide.globals.set("output", "");
             try {
                 await this.pyodide.runPythonAsync(codePython);
             } catch (error) {
@@ -166,6 +165,7 @@ const url = "https://api.openai.com/v1";
                     messageArray
                 );
                 const codeChatGPT = response.choices[0].message.content;
+                console.log("codeChatGPT", codeChatGPT);
 
                 // Fetch executable python code
                 const codePython = await this.fetchExecutableCode();
