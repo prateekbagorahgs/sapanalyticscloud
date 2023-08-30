@@ -63,6 +63,7 @@ const url = "https://api.openai.com/v1";
                 await getScriptPromisify('https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js');
                 const pyodide = await loadPyodide();
                 this.pyodide = pyodide;
+                await this.pyodide.loadPackage('pandas');
                 console.log(["Pyodide loaded successfully."]);
             } catch (error) {
                 console.error("Unable to load pyodide: ", error);
