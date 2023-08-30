@@ -167,7 +167,7 @@ const url = "https://api.openai.com/v1";
                     messageArray
                 );
                 const codeChatGPT = response.choices[0].message.content;
-                console.log("codeChatGPT", codeChatGPT);
+                console.log(["codeChatGPT", codeChatGPT]);
 
                 // Fetch executable python code
                 const codePython = await this.fetchExecutableCode();
