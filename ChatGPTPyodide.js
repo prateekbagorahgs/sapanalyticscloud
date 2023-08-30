@@ -50,9 +50,7 @@ const url = "https://api.openai.com/v1";
     constructor () {
       super();
       this.pyodide = null;
-      this.messageArray = null;
       this.fetchPyodide();
-      this.fetchResultSet();
     }
 
     // Funtion to load pyodide
@@ -92,8 +90,9 @@ const url = "https://api.openai.com/v1";
                 }
             }
         }
-        this.resultSet = JSON.stringify(resultSet);
-        console.log(["resultSet", this.resultSet]);
+        resultSet = JSON.stringify(resultSet);
+		return resultSet
+        console.log(["resultSet", resultSet]);
       }
         catch (error) {
           console.error('Error in Fetching Dataset:', error);
@@ -101,16 +100,16 @@ const url = "https://api.openai.com/v1";
       }
     
     // Function for getting data from the model bound to the widget
-    async prepareMessages() {
+    async prepareMessages(resultSet, prompt) {
       try {
         let messageArray = [];
-        
+
         const regex_quote = new RegExp("\"", "g");
         const regex_newline = new RegExp("\\n", "g");
   
         // Managing conversation history to maintain session
         // The first message contains dataset in JSON format and instructions to ChatGPT
-        var instructions = "You are my laconic assistant. Read the below data in JSON format from SAP Analytics Cloud. Only answer compact python code <code> to determine the answer to further questions with no other text. I will myself pass it to exec(<code>, {'json_data', json.loads(json_data)}), where json_data = " + this.resultSet + "\n\nStore the final result in variable 'output'.";
+        var instructions = "You are my laconic assistant. Read the below data in JSON format from SAP Analytics Cloud. Only answer compact python code <code> to determine the answer to further questions with no other text. I will myself pass it to exec(<code>, {'json_data', json.loads(json_data)}), where json_data = " + resultSet + "\n\nStore the final result in variable 'output'.";
         instructions = instructions.replace(regex_quote, "\\\"");
         var firstMessage = '{"role": "system", "content": "' + instructions + '"}';
         const messageObject = JSON.parse(firstMessage.replace(regex_newline, "\\\\n"));        
@@ -124,6 +123,7 @@ const url = "https://api.openai.com/v1";
             console.error('Error parsing Prompt JSON:', error);
             }
           }
+        return messageArray;
         console.log(["messageArray", messageArray]);
         } catch (error) {
         console.error('Error in preparing Messages:', error);
@@ -133,8 +133,10 @@ const url = "https://api.openai.com/v1";
     async post(apiKey, endpoint, prompt) {
 
       // Getting data from the model bound to the widget
-      const messageArray = await this.prepareMessages();
-      console.log("messageArray", messageArray);
+	  const resultSet = await this.fetchResultSet();
+      console.log(["resultSet", resultSet]);
+      const messageArray = await this.prepareMessages(resultSet, prompt);
+      console.log("messageArray post", messageArray);
 
       // API call to ChatGPT
       const { response } = await ajaxCall(
@@ -148,5 +150,5 @@ const url = "https://api.openai.com/v1";
       return output;
     }
   }
-  customElements.define("chatgpt-pyodide-widget", MainWebComponent);
+  customElements.define("chatgpt-databindings-widget", MainWebComponent);
 })();
