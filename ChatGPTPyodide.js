@@ -131,6 +131,14 @@ const url = "https://api.openai.com/v1";
             }
         }
 
+        async fetchExecutableCode(){
+            var codePython = "import json;\n";
+            codePython = codePython + "json_data = json.loads(\"\"\"${resultSet}\"\"\")\n";
+            codePython = codePython + "output = None\n";
+            codePython = codePython + "exec(\"\"\"${codeChatGPT}\"\"\", globals())";
+            return codePython;
+        }
+        
         async post(apiKey, endpoint, prompt) {
 
             // Getting data from the model bound to the widget
@@ -145,10 +153,13 @@ const url = "https://api.openai.com/v1";
                 `${url}/${endpoint}`,
                 messageArray
             );
-            const code = response.choices[0].message.content;
-            console.log(["code", code]);
-            
-            const codeOutput = this.runPythonCode(code);
+            const codeChatGPT = response.choices[0].message.content;
+            console.log(["code", codeChatGPT]);
+
+            const codePython = this.fetchExecutableCode();
+            console.log(codePython);
+
+            const codeOutput = this.runPythonCode(codePython);
             console.log(["codeOutput", codeOutput]);            
         }
     }
