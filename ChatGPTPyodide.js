@@ -59,10 +59,14 @@ const url = "https://api.openai.com/v1";
 
         // Funtion to load pyodide
         async fetchPyodide() {
-            await getScriptPromisify('https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js');
-            const pyodide = await loadPyodide();
-            this.pyodide = pyodide;
-            console.log(["pyodide", this.pyodide]);
+            try {
+                await getScriptPromisify('https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js');
+                const pyodide = await loadPyodide();
+                this.pyodide = pyodide;
+                console.log(["Pyodide loaded successfully."]);
+            } catch (error) {
+                console.error("Unable to load pyodide: ", error);
+            }
         }
 
         // Function to remove unnecessary properties from dimensions and measures to reduce dataset size
@@ -88,9 +92,9 @@ const url = "https://api.openai.com/v1";
                     }
                 }
                 resultSet = JSON.stringify(resultSet);
-                return resultSet
+                return resultSet;
             } catch (error) {
-                console.error('Error in Fetching Dataset:', error);
+                console.error("Unable to fetch dataset: ", error);
             }
         }
 
@@ -115,18 +119,17 @@ const url = "https://api.openai.com/v1";
                         const messageObject = JSON.parse(promptString.replace(regex_newline, "\\\\n"));
                         messageArray.push(messageObject);
                     } catch (error) {
-                        console.error('Error parsing Prompt JSON:', error);
+                        console.error("Error parsing prompt JSON: ", error);
                     }
                 }
                 return messageArray;
             } catch (error) {
-                console.error('Error in preparing Messages:', error);
+                console.error("Could not prepare messages: ", error);
             }
         }
 
         // Function to create executable pyhton code
         async fetchExecutableCode() {
-
             var codePython = "import json;\n";
             codePython = codePython + "json_data = json.loads(resultSet)\n";
             codePython = codePython + "exec(codeChatGPT, globals())\n";
@@ -136,39 +139,41 @@ const url = "https://api.openai.com/v1";
 
         // Function to run python code in pyodide
         async runPythonCode(resultSet, codeChatGPT, codePython) {
-
             this.pyodide.globals.set("resultSet", resultSet);
             this.pyodide.globals.set("codeChatGPT", codeChatGPT);
             this.pyodide.globals.set("output", "");
-
             try {
                 await this.pyodide.runPythonAsync(codePython);
             } catch (error) {
-                console.error("Error in pyodide code execution.", error);
+                console.error("Could not execute pyodide code: ", error);
             }
         }
 
         // Main function
         async post(apiKey, endpoint, prompt) {
 
-            // Getting data from the model bound to the widget
-            const resultSet = await this.fetchResultSet();
-            const messageArray = await this.prepareMessages(resultSet, prompt);
+            try {
+                // Getting data from the model bound to the widget
+                const resultSet = await this.fetchResultSet();
+                const messageArray = await this.prepareMessages(resultSet, prompt);
 
-            // API call to ChatGPT
-            const {
-                response
-            } = await ajaxCall(
-                apiKey,
-                `${url}/${endpoint}`,
-                messageArray
-            );
-            const codeChatGPT = response.choices[0].message.content;
-            const codePython = await this.fetchExecutableCode();
-            await this.runPythonCode(resultSet, codeChatGPT, codePython);
-            const codeOutput = this.pyodide.globals.get("output");
-            console.log(["codeOutput", codeOutput]);
-            return codeOutput;
+                // API call to ChatGPT
+                const {
+                    response
+                } = await ajaxCall(
+                    apiKey,
+                    `${url}/${endpoint}`,
+                    messageArray
+                );
+                const codeChatGPT = response.choices[0].message.content;
+                const codePython = await this.fetchExecutableCode();
+                await this.runPythonCode(resultSet, codeChatGPT, codePython);
+                const codeOutput = this.pyodide.globals.get("output");
+                console.log(["codeOutput", codeOutput]);
+                return codeOutput;
+            } catch (error) {
+                console.error("Could not execute the post request: ", error);
+            }
         }
     }
     customElements.define("chatgpt-pyodide-widget", MainWebComponent);
