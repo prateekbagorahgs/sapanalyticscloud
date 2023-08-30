@@ -133,9 +133,9 @@ const url = "https://api.openai.com/v1";
 
         async fetchExecutableCode(){
             var codePython = "import json;\n";
-            codePython = codePython + "json_data = json.loads(\"\"\"${resultSet}\"\"\")\n";
+            codePython = codePython + "json_data = json.loads(\"\"\"resultSet\"\"\")\n";
             codePython = codePython + "output = None\n";
-            codePython = codePython + "exec(\"\"\"${codeChatGPT}\"\"\", globals())";
+            codePython = codePython + "exec(\"\"\"codeChatGPT\"\"\", globals())";
             return codePython;
         }
         
@@ -156,12 +156,15 @@ const url = "https://api.openai.com/v1";
             const codeChatGPT = response.choices[0].message.content;
             console.log(["code", codeChatGPT]);
 
+            this.pyodide.globals.set("resultSet", resultSet);
+            this.pyodide.globals.set("messageArray", messageArray);
+
             const codePython = this.fetchExecutableCode();
             console.log(codePython);
-
-            const codeOutput = this.runPythonCode(codePython);
-            console.log(["codeOutput", codeOutput]);            
-        }
+            
+            this.runPythonCode(codePython);
+            const codeOutput = this.pyodide.globals.get("output");
+            console.log(["codeOutput", codeOutput]);        }
     }
     customElements.define("chatgpt-pyodide-widget", MainWebComponent);
 })();
