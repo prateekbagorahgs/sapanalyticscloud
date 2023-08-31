@@ -143,6 +143,18 @@ const url = "https://api.openai.com/v1";
             return item;
         }
 
+        // Function to derive measure details from data set
+        fetchMeasures() {
+            var measures = [];
+            for (const obj of this.resultSet) {
+                for (const key in obj) {
+                    if (typeof obj[key] === 'object') {
+                        return obj[key];
+                    }
+                }
+            }       
+        }
+        
         // Function for getting sample data for the model bound to the widget
         async fetchSampleSet() {
                 try {
