@@ -109,6 +109,23 @@ const url = "https://api.openai.com/v1";
             }
         }
 
+        // Function for getting sample data for the model bound to the widget
+        async fetchSampleSet() {
+                try {
+                    var samplet = await this.dataBindings.getDataBinding("myDataBinding").getDataSource().getMeasures();   
+
+                    for (const obj of resultSet) {
+                        for (const key in obj) {
+                            if (typeof obj[key] === 'object') {
+                                this.trimResultSet(obj[key]);
+                            }
+                        }
+                    }
+                } catch (error) {
+                console.error("Unable to fetch sample set: ", error);
+            }      
+        }
+        
         // Function to replace in sample data with dummy values
         replaceWithDummy(type, key, item, isMeasure) {
             if (typeof item === 'object') {
