@@ -186,8 +186,10 @@ const url = "https://api.openai.com/v1";
 
         // Function to prepare result set and sample set
         async prepareDataSet() {
-            this.resultSet = await this.fetchResultSet();
-            this.sampleSet = "[" + JSON.stringify(this.replaceWithDummy(null, null, this.resultSet[0], false)) + ", ...]";
+            if (this.resultSet === null) {
+                this.resultSet = await this.fetchResultSet();
+                this.sampleSet = "[" + JSON.stringify(this.replaceWithDummy(null, null, this.resultSet[0], false)) + ", ...]";                
+            }
         }
 
         // Main function
