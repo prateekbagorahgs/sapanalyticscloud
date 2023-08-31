@@ -73,7 +73,7 @@ const url = "https://api.openai.com/v1";
             }
         }
 
-        // Function to create executable pyhton code
+        // Function to create executable python code
         fetchPythonCode() {
             var codePython = "import json;\n";
             codePython = codePython + "json_data = resultSet\n";
