@@ -1,5 +1,3 @@
-import _ from 'lodash';
-
 var getScriptPromisify = (src) => {
     return new Promise(resolve => {
         $.getScript(src, resolve);
@@ -225,6 +223,7 @@ const url = "https://api.openai.com/v1";
                 console.log(["messageArray", messageArray]);
 
                 // API call to ChatGPT
+                /*
                 const {
                     response
                 } = await ajaxCall(
@@ -234,8 +233,9 @@ const url = "https://api.openai.com/v1";
                 );
                 const codeChatGPT = this.extractChatGPTCode(response.choices[0].message.content);
                 console.log(["codeChatGPT", codeChatGPT]);
+                */
 
-                // const codeChatGPT = `output = {item['Vendor']['description']: 0 for item in json_data if item['@MeasureDimension']['description'] == 'Order Qty'}\nfor item in json_data:\n    if item['@MeasureDimension']['description'] == 'Order Qty':\n        output[item['Vendor']['description']] += int(item['@MeasureDimension']['rawValue'])\noutput = ', '.join([f'{k}: {v}' for k, v in output.items()])`;
+                const codeChatGPT = this.extractChatGPTCode(`output = {item['Vendor']['description']: 0 for item in json_data if item['@MeasureDimension']['description'] == 'Order Qty'}\nfor item in json_data:\n    if item['@MeasureDimension']['description'] == 'Order Qty':\n        output[item['Vendor']['description']] += int(item['@MeasureDimension']['rawValue'])\noutput = ', '.join([f'{k}: {v}' for k, v in output.items()])`);
 
                 // Execte python code in pyodide
                 await this.runPythonCode(codeChatGPT);
