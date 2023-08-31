@@ -76,6 +76,7 @@ const url = "https://api.openai.com/v1";
         // Function to create executable pyhton code
         fetchPythonCode() {
             var codePython = "import json;\n";
+            codePython = codePython + "json_data = resultSet\n";
             codePython = codePython + "exec(codeChatGPT, globals())\n";
             codePython = codePython + "print(output)";
             return codePython;
