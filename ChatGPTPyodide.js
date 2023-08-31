@@ -76,7 +76,7 @@ const url = "https://api.openai.com/v1";
         // Function to create executable python code
         fetchPythonCode() {
             var codePython = "import json;\n";
-            codePython = codePython + "json_data = resultSet\n";
+            codePython = codePython + "json_data = json.loads(resultSet)\n";
             codePython = codePython + "exec(codeChatGPT, globals())\n";
             codePython = codePython + "print(output)";
             return codePython;
@@ -114,12 +114,12 @@ const url = "https://api.openai.com/v1";
             if (typeof item === 'object') {
                 if (Array.isArray(item)) {
                     for (let i = 0; i < item.length; i++) {
-                        item[i] = replaceWithDummy(item[i]);
+                        item[i] = this.replaceWithDummy(item[i]);
                     }
                 } else {
                     for (const key in item) {
                         if (item.hasOwnProperty(key)) {
-                            item[key] = replaceWithDummy(item[key]);
+                            item[key] = this.replaceWithDummy(item[key]);
                         }
                     }
                 }
@@ -147,7 +147,7 @@ const url = "https://api.openai.com/v1";
 
                 // Managing conversation history to maintain session
                 // The first message contains dataset in JSON format and instructions to ChatGPT
-                var instructions = "You are my laconic python developer. Refer to below JSON format of json_data from SAP Analytics Cloud. Only answer compact pyodide python code <code> to determine the answer to further questions. I will myself pass it to exec(<code>, {'json_data', json.loads(json_data)}).\n\nHere, json_data looks like " + this.sampleSet + "The <code> should store the final result in variable 'output' as a descriptive string understandable to business users.";
+                var instructions = "You are my laconic python developer. Refer to below JSON format of json_data from SAP Analytics Cloud. Only answer compact pyodide python code <code> to determine the answer to further questions. I will myself pass it to exec(<code>, {'json_data', json.loads(json_data)}).\n\nHere, json_data looks like " + JSON.stringify(this.sampleSet) + "The <code> should store the final result in variable 'output' as a descriptive string understandable to business users.";
                 instructions = instructions.replace(regex_quote, "\\\"");
                 var firstMessage = '{"role": "system", "content": "' + instructions + '"}';
                 var messageObject = JSON.parse(firstMessage.replace(regex_newline, "\\\\n"));
@@ -169,7 +169,7 @@ const url = "https://api.openai.com/v1";
 
         // Function to run python code in pyodide
         async runPythonCode(codeChatGPT) {
-            this.pyodide.globals.set("resultSet", this.resultSet);
+            this.pyodide.globals.set("resultSet", JSON.stringify(this.resultSet));
             this.pyodide.globals.set("codeChatGPT", codeChatGPT);
             this.pyodide.globals.set("output", "");
             try {
