@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 var getScriptPromisify = (src) => {
     return new Promise(resolve => {
         $.getScript(src, resolve);
@@ -189,7 +191,7 @@ const url = "https://api.openai.com/v1";
         async prepareDataSet() {
             if (this.resultSet === null) {
                 this.resultSet = await this.fetchResultSet();
-                this.sampleSet = "[" + JSON.stringify(this.replaceWithDummy(null, null, this.resultSet[0], false)) + ", ...]";                
+                this.sampleSet = "[" + JSON.stringify(this.replaceWithDummy(null, null, _.cloneDeep(this.resultSet[0]), false)) + ", ...]";                
             }
         }
 
