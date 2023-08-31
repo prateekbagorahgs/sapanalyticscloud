@@ -110,41 +110,31 @@ const url = "https://api.openai.com/v1";
             }
         }
 
-        generateDummyValue(value) {
-            if (typeof value === "string") {
-                return "abcd";
-            } else if (typeof value === "number") {
-                return 9999;
-            } else if (typeof value === "boolean") {
-                return true;
-            }
-            return null;
-        }
-
-        replaceWithDummyValue(element) {
-            if (typeof element === "object" && !Array.isArray(element)) {
-                for (const key in element) {
-                    if (typeof element[key] === "object") {
-                        this.replaceWithDummy(element[key]);
-                    } else {
-                        element[key] = this.generateDummyValue(element[key]);
+        replaceWithDummy(item) {
+            if (typeof item === 'object') {
+                if (Array.isArray(item)) {
+                    for (let i = 0; i < item.length; i++) {
+                        item[i] = replaceWithDummy(item[i]);
+                    }
+                } else {
+                    for (const key in item) {
+                        if (item.hasOwnProperty(key)) {
+                            item[key] = replaceWithDummy(item[key]);
+                        }
                     }
                 }
-            }
-        }
-
-        // Derive a sample structure of data
-        async fetchSampleSet() {
-            try {
-                const row = this.resultSet[0];
-                for (const element of row) {
-                    this.replaceWithDummy(element);
+            } else {
+                if (typeof item === 'string') {
+                    item = 'abcd';
+                } else if (typeof item === 'number') {
+                    item = 0;
+                } else if (typeof item === 'boolean') {
+                    item = false;
+                } else if (item === null) {
+                    item = null;
                 }
-                return sampleSet;
-            } catch (error) {
-                console.error("Dataset is probably empty: ", error);
-                throw error;
             }
+            return item;
         }
 
         // Function for getting data from the model bound to the widget
@@ -189,23 +179,31 @@ const url = "https://api.openai.com/v1";
             }
         }
 
+        // Function to prepare result set and sample set
+        async prepareDataSet() {
+            if (this.resultSet === null) {
+                this.resultSet = await this.fetchResultSet();
+                this.sampleSet = await this.fetchSampleSet();
+            }
+        }
+
         // Main function
         async post(apiKey, endpoint, prompt) {
             try {
 
-                // Getting data from the model bound to the widget
-                if (this.resultSet === null) {
-                    this.resultSet = await this.fetchResultSet();
-                    this.sampleSet = await this.fetchSampleSet();
-                    console.log(["resultSet", this.resultSet]);
-                    console.log(["sampleSet", this.sampleSet]);
-                }
+                // Prepare result set and sample set
+                this.resultSet = await this.fetchResultSet();
+                console.log(["resultSet", this.resultSet]);
+
+                this.sampleSet = this.replaceWithDummy(this.resultSet[0]);
+                console.log(["sampleSet", this.sampleSet]);
 
                 // Prepare messages for ChatGPT
                 const messageArray = await this.prepareMessages(prompt);
                 console.log(["messageArray", messageArray]);
 
                 // API call to ChatGPT
+                /*
                 const {
                     response
                 } = await ajaxCall(
@@ -215,8 +213,9 @@ const url = "https://api.openai.com/v1";
                 );
                 const codeChatGPT = response.choices[0].message.content;
                 console.log(["codeChatGPT", codeChatGPT]);
+                */
 
-                // const codeChatGPT = `output = {item['Vendor']['description']: 0 for item in json_data if item['@MeasureDimension']['description'] == 'Order Qty'}\nfor item in json_data:\n    if item['@MeasureDimension']['description'] == 'Order Qty':\n        output[item['Vendor']['description']] += int(item['@MeasureDimension']['rawValue'])\noutput = ', '.join([f'{k}: {v}' for k, v in output.items()])`;
+                const codeChatGPT = `output = {item['Vendor']['description']: 0 for item in json_data if item['@MeasureDimension']['description'] == 'Order Qty'}\nfor item in json_data:\n    if item['@MeasureDimension']['description'] == 'Order Qty':\n        output[item['Vendor']['description']] += int(item['@MeasureDimension']['rawValue'])\noutput = ', '.join([f'{k}: {v}' for k, v in output.items()])`;
 
                 // Execte python code in pyodide
                 await this.runPythonCode(codeChatGPT);
