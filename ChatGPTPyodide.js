@@ -194,7 +194,11 @@ const url = "https://api.openai.com/v1";
                 // Prepare result set and sample set
                 // this.resultSet = await this.fetchResultSet();
                 // this.sampleSet = "[" + JSON.stringify(this.replaceWithDummy(this.resultSet[0])) + ", ...]";
-                
+
+                if (this.resultSet === null) {
+                    this.prepareDataSet();
+                }
+                this.prepareDataset();
                 console.log(["resultSet", this.resultSet]);
                 console.log(["sampleSet", this.sampleSet]);
 
@@ -212,7 +216,7 @@ const url = "https://api.openai.com/v1";
                 );
                 const codeChatGPT = response.choices[0].message.content;
                 console.log(["codeChatGPT", codeChatGPT]);
-                    
+
                 //const codeChatGPT = `output = {item['Vendor']['description']: 0 for item in json_data if item['@MeasureDimension']['description'] == 'Order Qty'}\nfor item in json_data:\n    if item['@MeasureDimension']['description'] == 'Order Qty':\n        output[item['Vendor']['description']] += int(item['@MeasureDimension']['rawValue'])\noutput = ', '.join([f'{k}: {v}' for k, v in output.items()])`;
 
                 // Execte python code in pyodide
