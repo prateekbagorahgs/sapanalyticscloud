@@ -109,6 +109,7 @@ const url = "https://api.openai.com/v1";
             }
         }
 
+        // Function to replace in sample data with dummy values
         replaceWithDummy(type, key, item, isMeasure) {
             if (typeof item === 'object') {
                 if (Array.isArray(item)) {
