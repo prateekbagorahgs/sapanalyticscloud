@@ -110,28 +110,26 @@ const url = "https://api.openai.com/v1";
             }
         }
 
-        replaceWithDummy(item) {
+        replaceWithDummy(key, item) {
             if (typeof item === 'object') {
                 if (Array.isArray(item)) {
                     for (let i = 0; i < item.length; i++) {
-                        item[i] = this.replaceWithDummy(item[i]);
+                        item[i] = this.replaceWithDummy(null, item[i]);
                     }
                 } else {
                     for (const key in item) {
                         if (item.hasOwnProperty(key)) {
-                            item[key] = this.replaceWithDummy(item[key]);
+                            item[key] = this.replaceWithDummy(key, item[key]);
                         }
                     }
                 }
             } else {
-                if (typeof item === 'string') {
-                    item = 'abcd';
-                } else if (typeof item === 'number') {
-                    item = 0;
-                } else if (typeof item === 'boolean') {
-                    item = false;
-                } else if (item === null) {
-                    item = null;
+                if (!isNaN(Number(item))) {
+                    item = Math.round(item * Math.random());
+                } else if (!isNaN(new Date(item))) {
+                    item = "01/01/1991";
+                } else if (typeof item === "string") {
+                    item = "dummy " + key;
                 }
             }
             return item;
@@ -183,7 +181,7 @@ const url = "https://api.openai.com/v1";
         async prepareDataSet() {
             if (this.resultSet === null) {
                 this.resultSet = await this.fetchResultSet();
-                this.sampleSet = "[" + JSON.stringify(this.replaceWithDummy(this.resultSet[0])) + ", ...]";
+                this.sampleSet = "[" + JSON.stringify(this.replaceWithDummy(null, this.resultSet[0])) + ", ...]";
             }
         }
 
@@ -195,9 +193,7 @@ const url = "https://api.openai.com/v1";
                 // this.resultSet = await this.fetchResultSet();
                 // this.sampleSet = "[" + JSON.stringify(this.replaceWithDummy(this.resultSet[0])) + ", ...]";
 
-                if (this.resultSet === null) {
-                    this.prepareDataSet();
-                }
+                await this.prepareDataSet();
 
                 console.log(["resultSet", this.resultSet]);
                 console.log(["sampleSet", this.sampleSet]);
@@ -217,7 +213,7 @@ const url = "https://api.openai.com/v1";
                 const codeChatGPT = response.choices[0].message.content;
                 console.log(["codeChatGPT", codeChatGPT]);
 
-                //const codeChatGPT = `output = {item['Vendor']['description']: 0 for item in json_data if item['@MeasureDimension']['description'] == 'Order Qty'}\nfor item in json_data:\n    if item['@MeasureDimension']['description'] == 'Order Qty':\n        output[item['Vendor']['description']] += int(item['@MeasureDimension']['rawValue'])\noutput = ', '.join([f'{k}: {v}' for k, v in output.items()])`;
+                // const codeChatGPT = `output = {item['Vendor']['description']: 0 for item in json_data if item['@MeasureDimension']['description'] == 'Order Qty'}\nfor item in json_data:\n    if item['@MeasureDimension']['description'] == 'Order Qty':\n        output[item['Vendor']['description']] += int(item['@MeasureDimension']['rawValue'])\noutput = ', '.join([f'{k}: {v}' for k, v in output.items()])`;
 
                 // Execte python code in pyodide
                 await this.runPythonCode(codeChatGPT);
