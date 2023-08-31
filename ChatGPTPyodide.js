@@ -78,7 +78,6 @@ const url = "https://api.openai.com/v1";
             var codePython = "import json;\n";
             codePython = codePython + "json_data = json.loads(resultSet)\n";
             codePython = codePython + "exec(codeChatGPT, globals())\n";
-            codePython = codePython + "print(output)";
             return codePython;
         }
 
@@ -110,26 +109,34 @@ const url = "https://api.openai.com/v1";
             }
         }
 
-        replaceWithDummy(key, item) {
+        replaceWithDummy(type, key, item, isMeasure) {
             if (typeof item === 'object') {
                 if (Array.isArray(item)) {
                     for (let i = 0; i < item.length; i++) {
-                        item[i] = this.replaceWithDummy(null, item[i]);
+                        item[i] = this.replaceWithDummy(null, null, item[i], false);
                     }
                 } else {
                     for (const key in item) {
-                        if (item.hasOwnProperty(key)) {
-                            item[key] = this.replaceWithDummy(key, item[key]);
+                        if (typeof item[key] === 'object') {
+                            if (key === "@MeasureDimension") {
+                                item[key] = this.replaceWithDummy(key, key, item[key], true);
+                            } else {
+                                item[key] = this.replaceWithDummy(key, key, item[key], isMeasure);
+                            }
+                        } else {
+                            item[key] = this.replaceWithDummy(type, key, item[key], isMeasure);
                         }
                     }
                 }
             } else {
-                if (!isNaN(Number(item))) {
-                    item = Math.round(item * Math.random());
-                } else if (!isNaN(new Date(item))) {
-                    item = "01/01/1991";
-                } else if (typeof item === "string") {
-                    item = "dummy " + key;
+                if (isMeasure && !isNaN(Number(item))) {
+                    item = Math.round(item * Math.random()) + "";
+                } else if (!isMeasure) {
+                    if (!isNaN(new Date(item))) {
+                        item = "01/01/1991";
+                    } else if (typeof item === "string") {
+                        item = "Dummy " + type;
+                    }
                 }
             }
             return item;
@@ -179,10 +186,8 @@ const url = "https://api.openai.com/v1";
 
         // Function to prepare result set and sample set
         async prepareDataSet() {
-            if (this.resultSet === null) {
-                this.resultSet = await this.fetchResultSet();
-                this.sampleSet = "[" + JSON.stringify(this.replaceWithDummy(null, this.resultSet[0])) + ", ...]";
-            }
+            this.resultSet = await this.fetchResultSet();
+            this.sampleSet = "[" + JSON.stringify(this.replaceWithDummy(null, null, this.resultSet[0], false)) + ", ...]";
         }
 
         // Main function
