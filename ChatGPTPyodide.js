@@ -193,6 +193,11 @@ const url = "https://api.openai.com/v1";
             }
         }
 
+        // Extract ChatGPT code from ChatGPT response
+        extractChatGPTCode(codeChatGPT) {
+            
+        }
+
         // Main function
         async post(apiKey, endpoint, prompt) {
             try {
