@@ -134,7 +134,7 @@ const url = "https://api.openai.com/v1";
         }
 
         // Derive a sample structure of data
-        fetchSampleSet() {
+        async fetchSampleSet() {
             try {
                 const row = this.resultSet[0];
                 for (const element of row) {
@@ -148,7 +148,7 @@ const url = "https://api.openai.com/v1";
         }
 
         // Function for getting data from the model bound to the widget
-        prepareMessages(prompt) {
+        async prepareMessages(prompt) {
             try {
                 let messageArray = [];
 
@@ -196,7 +196,7 @@ const url = "https://api.openai.com/v1";
                 // Getting data from the model bound to the widget
                 if (this.resultSet === null) {
                     this.resultSet = await this.fetchResultSet();
-                    this.sampleSet = this.fetchSampleSet();
+                    this.sampleSet = await this.fetchSampleSet();
                     console.log(["resultSet", this.resultSet]);
                     console.log(["sampleSet", this.sampleSet]);
                 }
