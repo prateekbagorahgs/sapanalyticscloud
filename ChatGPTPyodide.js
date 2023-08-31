@@ -198,7 +198,7 @@ const url = "https://api.openai.com/v1";
                 if (this.resultSet === null) {
                     this.prepareDataSet();
                 }
-                this.prepareDataset();
+
                 console.log(["resultSet", this.resultSet]);
                 console.log(["sampleSet", this.sampleSet]);
 
