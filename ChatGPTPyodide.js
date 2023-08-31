@@ -112,25 +112,25 @@ const url = "https://api.openai.com/v1";
         generateDummyValue(value) {
             if (typeof value === "string") {
                 return "abcd";
-                } else if (typeof value === "number") {
+            } else if (typeof value === "number") {
                 return 9999;
-                } else if (typeof value === "boolean") {
+            } else if (typeof value === "boolean") {
                 return true;
-                }
-            return null;
             }
+            return null;
+        }
 
         replaceWithDummyValue(element) {
             if (typeof element === "object" && !Array.isArray(element)) {
                 for (const key in element) {
                     if (typeof element[key] === "object") {
                         this.replaceWithDummy(element[key]);
-                        } else {
+                    } else {
                         element[key] = this.generateDummyValue(element[key]);
-                        }
                     }
                 }
             }
+        }
 
         // Derive a sample structure of data
         fetchSampleSet() {
@@ -138,12 +138,12 @@ const url = "https://api.openai.com/v1";
                 const firstElement = this.resultSet[0];
                 for (const element of jsonArray) {
                     this.replaceWithDummy(element);
-                    }
-                return sampleSet;
-                } catch (error) {
-                console.error("Dataset is probably empty: ", error);
                 }
+                return sampleSet;
+            } catch (error) {
+                console.error("Dataset is probably empty: ", error);
             }
+        }
 
         // Function for getting data from the model bound to the widget
         prepareMessages(prompt) {
@@ -196,7 +196,7 @@ const url = "https://api.openai.com/v1";
                     this.resultSet = await this.fetchResultSet();
                     this.sampleSet = this.fetchSampleSet();
                     console.log(["resultSet", this.resultSet]);
-                    console.log(["sampleSet", this.sampleSet]);   
+                    console.log(["sampleSet", this.sampleSet]);
                 }
 
                 // Prepare messages for ChatGPT
