@@ -182,8 +182,12 @@ const url = "https://api.openai.com/v1";
         // Function to prepare result set and sample set
         async prepareDataSet() {
             if (this.resultSet === null) {
-                this.resultSet = await this.fetchResultSet();
-                this.sampleSet = await this.fetchSampleSet();
+                try {
+                    this.resultSet = await this.fetchResultSet();
+                    this.sampleSet = this.replaceWithDummy(this.resultSet[0]);
+                } catch (error) {
+                    console.error("Could not create result set and sample set", error);
+                }
             }
         }
 
@@ -192,10 +196,11 @@ const url = "https://api.openai.com/v1";
             try {
 
                 // Prepare result set and sample set
-                this.resultSet = await this.fetchResultSet();
-                console.log(["resultSet", this.resultSet]);
+                // this.resultSet = await this.fetchResultSet();
+                // this.sampleSet = this.replaceWithDummy(this.resultSet[0]);
 
-                this.sampleSet = this.replaceWithDummy(this.resultSet[0]);
+                this.prepareDataSet();
+                console.log(["resultSet", this.resultSet]);
                 console.log(["sampleSet", this.sampleSet]);
 
                 // Prepare messages for ChatGPT
