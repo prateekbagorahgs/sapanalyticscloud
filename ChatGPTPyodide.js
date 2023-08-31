@@ -135,13 +135,14 @@ const url = "https://api.openai.com/v1";
         // Derive a sample structure of data
         fetchSampleSet() {
             try {
-                const firstElement = this.resultSet[0];
-                for (const element of jsonArray) {
+                const row = this.resultSet[0];
+                for (const element of row) {
                     this.replaceWithDummy(element);
                 }
                 return sampleSet;
             } catch (error) {
                 console.error("Dataset is probably empty: ", error);
+                throw error;
             }
         }
 
