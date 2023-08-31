@@ -147,7 +147,7 @@ const url = "https://api.openai.com/v1";
 
                 // Managing conversation history to maintain session
                 // The first message contains dataset in JSON format and instructions to ChatGPT
-                var instructions = "You are my laconic python developer. Refer to below JSON format of json_data from SAP Analytics Cloud. Only answer compact pyodide python code <code> to determine the answer to further questions. I will myself pass it to exec(<code>, {'json_data', json.loads(json_data)}).\n\nHere, json_data looks like " + JSON.stringify(this.sampleSet) + "The <code> should store the final result in variable 'output' as a descriptive string understandable to business users.";
+                var instructions = "You are my laconic python developer. Refer to below JSON format of json_data from SAP Analytics Cloud. Only answer compact pyodide python code <code> to determine the answer to further questions. I will myself pass it to exec(<code>, {'json_data', json.loads(json_data)}).\n\nHere, json_data looks like " + this.sampleSet + "The <code> should store the final result in variable 'output' as a descriptive string understandable to business users.";
                 instructions = instructions.replace(regex_quote, "\\\"");
                 var firstMessage = '{"role": "system", "content": "' + instructions + '"}';
                 var messageObject = JSON.parse(firstMessage.replace(regex_newline, "\\\\n"));
@@ -182,12 +182,8 @@ const url = "https://api.openai.com/v1";
         // Function to prepare result set and sample set
         async prepareDataSet() {
             if (this.resultSet === null) {
-                try {
-                    this.resultSet = await this.fetchResultSet();
-                    this.sampleSet = this.replaceWithDummy(this.resultSet[0]);
-                } catch (error) {
-                    console.error("Could not create result set and sample set", error);
-                }
+                this.resultSet = await this.fetchResultSet();
+                this.sampleSet = "[" + JSON.stringify(this.replaceWithDummy(this.resultSet[0])) + ", ...]";
             }
         }
 
@@ -197,9 +193,8 @@ const url = "https://api.openai.com/v1";
 
                 // Prepare result set and sample set
                 // this.resultSet = await this.fetchResultSet();
-                // this.sampleSet = this.replaceWithDummy(this.resultSet[0]);
-
-                this.prepareDataSet();
+                // this.sampleSet = "[" + JSON.stringify(this.replaceWithDummy(this.resultSet[0])) + ", ...]";
+                
                 console.log(["resultSet", this.resultSet]);
                 console.log(["sampleSet", this.sampleSet]);
 
@@ -208,7 +203,6 @@ const url = "https://api.openai.com/v1";
                 console.log(["messageArray", messageArray]);
 
                 // API call to ChatGPT
-                /*
                 const {
                     response
                 } = await ajaxCall(
@@ -218,9 +212,8 @@ const url = "https://api.openai.com/v1";
                 );
                 const codeChatGPT = response.choices[0].message.content;
                 console.log(["codeChatGPT", codeChatGPT]);
-                */
-
-                const codeChatGPT = `output = {item['Vendor']['description']: 0 for item in json_data if item['@MeasureDimension']['description'] == 'Order Qty'}\nfor item in json_data:\n    if item['@MeasureDimension']['description'] == 'Order Qty':\n        output[item['Vendor']['description']] += int(item['@MeasureDimension']['rawValue'])\noutput = ', '.join([f'{k}: {v}' for k, v in output.items()])`;
+                    
+                //const codeChatGPT = `output = {item['Vendor']['description']: 0 for item in json_data if item['@MeasureDimension']['description'] == 'Order Qty'}\nfor item in json_data:\n    if item['@MeasureDimension']['description'] == 'Order Qty':\n        output[item['Vendor']['description']] += int(item['@MeasureDimension']['rawValue'])\noutput = ', '.join([f'{k}: {v}' for k, v in output.items()])`;
 
                 // Execte python code in pyodide
                 await this.runPythonCode(codeChatGPT);
