@@ -195,7 +195,14 @@ const url = "https://api.openai.com/v1";
 
         // Extract ChatGPT code from ChatGPT response
         extractChatGPTCode(codeChatGPT) {
-            
+            const regex_python = /```python([\s\S]*?)```/g;
+            const regex_ticks = /```([\s\S]*?)```/g;
+            if (codeChatGPT.match(regex_python)) {
+                codeChatGPT = codeChatGPT.match(regex_python)[0].slice(9, -3).trim();
+            } else if (codeChatGPT.match(regex_ticks)) {
+                codeChatGPT = codeChatGPT.match(regex_ticks)[0].slice(3, -3).trim();
+            }
+            return codeChatGPT;
         }
 
         // Main function
@@ -223,7 +230,7 @@ const url = "https://api.openai.com/v1";
                     `${url}/${endpoint}`,
                     messageArray
                 );
-                const codeChatGPT = response.choices[0].message.content;
+                const codeChatGPT = this.extractChatGPTCode(response.choices[0].message.content);
                 console.log(["codeChatGPT", codeChatGPT]);
 
                 // const codeChatGPT = `output = {item['Vendor']['description']: 0 for item in json_data if item['@MeasureDimension']['description'] == 'Order Qty'}\nfor item in json_data:\n    if item['@MeasureDimension']['description'] == 'Order Qty':\n        output[item['Vendor']['description']] += int(item['@MeasureDimension']['rawValue'])\noutput = ', '.join([f'{k}: {v}' for k, v in output.items()])`;
