@@ -189,7 +189,7 @@ const url = "https://api.openai.com/v1";
         async prepareDataSet() {
             if (this.resultSet === null) {
                 this.resultSet = await this.fetchResultSet();
-                this.sampleSet = "[" + JSON.stringify(this.replaceWithDummy(null, null, _.cloneDeep(this.resultSet[0]), false)) + ", ...]";                
+                this.sampleSet = "[" + JSON.stringify(this.replaceWithDummy(null, null, JSON.parse(JSON.stringify(this.resultSet[0])), false)) + ", ...]";                
             }
         }
 
