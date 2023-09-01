@@ -230,6 +230,11 @@ const url = "https://api.openai.com/v1";
             return codeChatGPT;
         }
 
+        // Function to process failed query
+        dispose() {
+
+        }
+
         // Main function
         async post(apiKey, endpoint, prompt) {
             try {
