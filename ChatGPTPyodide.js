@@ -136,7 +136,7 @@ const url = "https://api.openai.com/v1";
                     if (!isNaN(new Date(item))) {
                         item = "01/01/1991";
                     } else if (typeof item === "string") {
-                        item = "Dummy " + type + " " + Math.round(Math.random()*100);
+                        item = "Dummy " + type + " " + Math.round(Math.random() * 100);
                     }
                 }
             }
@@ -145,25 +145,25 @@ const url = "https://api.openai.com/v1";
 
         // Function for getting sample data for the model bound to the widget
         async fetchSampleSet() {
-                try {
-                    var measures = await this.dataBindings.getDataBinding("myDataBinding").getDataSource().getMeasures();
-                    var sampleSet = [];
+            try {
+                var measures = await this.dataBindings.getDataBinding("myDataBinding").getDataSource().getMeasures();
+                var sampleSet = [];
 
-                    for (const obj of measures) {
-                        if (typeof obj === 'object') {
-                            this.trimResultSet(obj);
-                        }
+                for (const obj of measures) {
+                    if (typeof obj === 'object') {
+                        this.trimResultSet(obj);
                     }
+                }
 
-                    for (const measure of measures) {
-                        var sample = JSON.parse(JSON.stringify(this.resultSet[0]));
-                        sample["@MeasureDimension"]["description"] = measure["description"];
-                        sampleSet.push(sample);
-                    }
+                for (const measure of measures) {
+                    var sample = JSON.parse(JSON.stringify(this.resultSet[0]));
+                    sample["@MeasureDimension"]["description"] = measure["description"];
+                    sampleSet.push(sample);
+                }
 
-                    return this.replaceWithDummy(null, null, sampleSet, false);
+                return this.replaceWithDummy(null, null, sampleSet, false);
 
-                } catch (error) {
+            } catch (error) {
                 console.error("Unable to fetch sample set: ", error);
             }
         }
