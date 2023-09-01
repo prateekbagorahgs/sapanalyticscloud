@@ -83,10 +83,15 @@ const url = "https://api.openai.com/v1";
 
         // Function to remove unnecessary properties from dimensions and measures to reduce dataset size
         trimResultSet(obj) {
-            for (const key in obj) {
-                if (key !== "description" && key !== "rawValue") {
-                    delete obj[key];
-                }
+            try {
+                for (const key in obj) {
+                    if (key !== "description" && key !== "rawValue") {
+                        delete obj[key];
+                    }
+                }   
+            } catch (error) {
+                console.log("Error while trimming data set: ", error);
+                throw error;
             }
         }
 
@@ -106,41 +111,47 @@ const url = "https://api.openai.com/v1";
                 return resultSet;
             } catch (error) {
                 console.error("Unable to fetch dataset: ", error);
+                throw error;
             }
         }
 
         // Function to replace in sample data with dummy values
         replaceWithDummy(type, key, item, isMeasure) {
-            if (typeof item === 'object') {
-                if (Array.isArray(item)) {
-                    for (let i = 0; i < item.length; i++) {
-                        item[i] = this.replaceWithDummy(null, null, item[i], false);
+            try {
+                if (typeof item === 'object') {
+                    if (Array.isArray(item)) {
+                        for (let i = 0; i < item.length; i++) {
+                            item[i] = this.replaceWithDummy(null, null, item[i], false);
+                        }
+                    } else {
+                        for (const key in item) {
+                            if (typeof item[key] === 'object') {
+                                if (key === "@MeasureDimension") {
+                                    item[key] = this.replaceWithDummy(key, key, item[key], true);
+                                } else {
+                                    item[key] = this.replaceWithDummy(key, key, item[key], isMeasure);
+                                }
+                            } else {
+                                item[key] = this.replaceWithDummy(type, key, item[key], isMeasure);
+                            }
+                        }
                     }
                 } else {
-                    for (const key in item) {
-                        if (typeof item[key] === 'object') {
-                            if (key === "@MeasureDimension") {
-                                item[key] = this.replaceWithDummy(key, key, item[key], true);
-                            } else {
-                                item[key] = this.replaceWithDummy(key, key, item[key], isMeasure);
-                            }
-                        } else {
-                            item[key] = this.replaceWithDummy(type, key, item[key], isMeasure);
+                    if (isMeasure && !isNaN(Number(item))) {
+                        item = Math.round(item * Math.random()) + "";
+                    } else if (!isMeasure) {
+                        if (!isNaN(new Date(item))) {
+                            item = "01/01/1991";
+                        } else if (typeof item === "string") {
+                            item = "Dummy " + type + " " + Math.round(Math.random() * 100);
                         }
                     }
                 }
-            } else {
-                if (isMeasure && !isNaN(Number(item))) {
-                    item = Math.round(item * Math.random()) + "";
-                } else if (!isMeasure) {
-                    if (!isNaN(new Date(item))) {
-                        item = "01/01/1991";
-                    } else if (typeof item === "string") {
-                        item = "Dummy " + type + " " + Math.round(Math.random() * 100);
-                    }
-                }
+                return item;
+            } catch (error) {
+                console.log("Error while generating dummy values: ", error);
+                throw error;
             }
-            return item;
         }
 
         // Function for getting sample data for the model bound to the widget
@@ -148,23 +159,20 @@ const url = "https://api.openai.com/v1";
             try {
                 var measures = await this.dataBindings.getDataBinding("myDataBinding").getDataSource().getMeasures();
                 var sampleSet = [];
-
                 for (const obj of measures) {
                     if (typeof obj === 'object') {
                         this.trimResultSet(obj);
                     }
                 }
-
                 for (const measure of measures) {
                     var sample = JSON.parse(JSON.stringify(this.resultSet[0]));
                     sample["@MeasureDimension"]["description"] = measure["description"];
                     sampleSet.push(sample);
                 }
-
                 return this.replaceWithDummy(null, null, sampleSet, false);
-
             } catch (error) {
                 console.error("Unable to fetch sample set: ", error);
+                throw error;
             }
         }
 
@@ -172,7 +180,6 @@ const url = "https://api.openai.com/v1";
         async prepareMessages(prompt) {
             try {
                 let messageArray = [];
-
                 const regex_quote = new RegExp("\"", "g");
                 const regex_newline = new RegExp("\\n", "g");
 
@@ -195,44 +202,51 @@ const url = "https://api.openai.com/v1";
                 return messageArray;
             } catch (error) {
                 console.error("Could not prepare messages: ", error);
+                throw error;
             }
         }
 
         // Function to run python code in pyodide
         async runPythonCode(codeChatGPT) {
-            this.pyodide.globals.set("resultSet", JSON.stringify(this.resultSet));
-            this.pyodide.globals.set("codeChatGPT", codeChatGPT);
-            this.pyodide.globals.set("output", "");
             try {
+                this.pyodide.globals.set("resultSet", JSON.stringify(this.resultSet));
+                this.pyodide.globals.set("codeChatGPT", codeChatGPT);
+                this.pyodide.globals.set("output", "");
                 await this.pyodide.runPythonAsync(this.codePython);
             } catch (error) {
                 console.error("Could not execute pyodide code: ", error);
+                throw error;
             }
         }
 
         // Function to prepare result set and sample set
         async prepareDataSet() {
-            if (this.resultSet === null) {
-                this.resultSet = await this.fetchResultSet();
-                this.sampleSet = await this.fetchSampleSet();
+            try {
+                if (this.resultSet === null) {
+                    this.resultSet = await this.fetchResultSet();
+                    this.sampleSet = await this.fetchSampleSet();
+                }
+            } catch (error) {
+                console.log("Error while preparing result set and sample set: ", error);
+                throw error;
             }
         }
 
         // Extract ChatGPT code from ChatGPT response
         extractChatGPTCode(codeChatGPT) {
-            const regex_python = /```python([\s\S]*?)```/g;
-            const regex_ticks = /```([\s\S]*?)```/g;
-            if (codeChatGPT.match(regex_python)) {
-                codeChatGPT = codeChatGPT.match(regex_python)[0].slice(9, -3).trim();
-            } else if (codeChatGPT.match(regex_ticks)) {
-                codeChatGPT = codeChatGPT.match(regex_ticks)[0].slice(3, -3).trim();
+            try {
+                const regex_python = /```python([\s\S]*?)```/g;
+                const regex_ticks = /```([\s\S]*?)```/g;
+                if (codeChatGPT.match(regex_python)) {
+                    codeChatGPT = codeChatGPT.match(regex_python)[0].slice(9, -3).trim();
+                } else if (codeChatGPT.match(regex_ticks)) {
+                    codeChatGPT = codeChatGPT.match(regex_ticks)[0].slice(3, -3).trim();
+                }
+                return codeChatGPT;
+            } catch (error) {
+                console.log("Error while extracting code out of ChatGPT output: ", error);
+                throw error;
             }
-            return codeChatGPT;
-        }
-
-        // Function to process failed query
-        dispose() {
-
         }
 
         // Main function
