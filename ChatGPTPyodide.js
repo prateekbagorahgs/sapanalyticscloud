@@ -270,7 +270,8 @@ const url = "https://api.openai.com/v1";
 
                 return codeOutput;
             } catch (error) {
-                console.error("Could not execute the post request: ", error);
+                console.error("Your query could not be processed. Please try to reformulate your question.", error);
+                return "Your query could not be processed. Please try to reformulate your question";
             }
         }
     }
