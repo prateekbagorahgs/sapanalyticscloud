@@ -13,7 +13,7 @@ var ajaxCall = (key, url, messages) => {
             data: JSON.stringify({
                 // model: "gpt-3.5-turbo",
                 // max_tokens: 1024,
-                model: "gpt-4",
+                model: "gpt-4-0613",
                 max_tokens: 1024,
                 messages: messages,
                 n: 1,
