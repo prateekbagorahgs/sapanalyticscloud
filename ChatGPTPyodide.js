@@ -193,7 +193,7 @@ const url = "https://api.openai.com/v1";
 
                 instructions = "Answer to conversational questions too in python code storing your answer in string variable 'output'";
                 instructions = instructions.replace(regex_quote, "\\\"");
-                firstMessage = '{"role": "system", "content": "' + instructions + '"}';
+                firstMessage = '{"role": "user", "content": "' + instructions + '"}';
                 messageObject = JSON.parse(firstMessage.replace(regex_newline, "\\\\n"));
                 messageArray.push(messageObject);
 
