@@ -13,7 +13,7 @@ var ajaxCall = (key, url, messages) => {
             data: JSON.stringify({
                 // model: "gpt-3.5-turbo",
                 // max_tokens: 1024,
-                model: "gpt-4",
+                model: "gpt-4-0613",
                 max_tokens: 1024,
                 messages: messages,
                 n: 1,
@@ -185,13 +185,25 @@ const url = "https://api.openai.com/v1";
 
                 // Managing conversation history to maintain session
                 // The first message contains dataset in JSON format and instructions to ChatGPT
-                var instructions = "You are my laconic python developer. Refer to below JSON format of json_data from SAP Analytics Cloud. Only answer compact pyodide python code <code> to determine the answer to further questions. I will myself pass it to exec(<code>, {'json_data', json.loads(json_data)}).\n\nHere, json_data looks like " + JSON.stringify(this.sampleSet).slice(0, -1) + ", ...]" + "\n\nAlways answer with a python <code>, even for conversational questions, storing the final result in variable 'output' as a descriptive string understandable to business users.";
+                var instructions = "You are my laconic python developer. Refer to below JSON format of multi-dimensional json_data from SAP Analytics Cloud. Only answer compact pyodide python code <code> to answer with aggregated results to further questions. I will myself pass it to exec(<code>, {'json_data', json.loads(json_data)}).";
                 instructions = instructions.replace(regex_quote, "\\\"");
                 var firstMessage = '{"role": "system", "content": "' + instructions + '"}';
                 var messageObject = JSON.parse(firstMessage.replace(regex_newline, "\\\\n"));
                 messageArray.push(messageObject);
 
-                instructions = "Answer to conversational questions too in python code storing your answer in string variable 'output'.";
+                instructions = "Here, json_data looks like " + JSON.stringify(this.sampleSet).slice(0, -1) + ", ...]";
+                instructions = instructions.replace(regex_quote, "\\\"");
+                firstMessage = '{"role": "system", "content": "' + instructions + '"}';
+                messageObject = JSON.parse(firstMessage.replace(regex_newline, "\\\\n"));
+                messageArray.push(messageObject);
+                    
+                instructions = "Always answer with a python code storing the final result in variable 'output' as a descriptive string understandable to business users.";
+                instructions = instructions.replace(regex_quote, "\\\"");
+                firstMessage = '{"role": "system", "content": "' + instructions + '"}';
+                messageObject = JSON.parse(firstMessage.replace(regex_newline, "\\\\n"));
+                messageArray.push(messageObject);
+
+                instructions = "Answer to conversational questions too in python code storing your answer in string variable 'output'";
                 instructions = instructions.replace(regex_quote, "\\\"");
                 firstMessage = '{"role": "user", "content": "' + instructions + '"}';
                 messageObject = JSON.parse(firstMessage.replace(regex_newline, "\\\\n"));
