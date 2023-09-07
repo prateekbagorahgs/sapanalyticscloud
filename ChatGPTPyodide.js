@@ -185,13 +185,13 @@ const url = "https://api.openai.com/v1";
 
                 // Managing conversation history to maintain session
                 // The first message contains dataset in JSON format and instructions to ChatGPT
-                var instructions = "You are my laconic python developer. Refer to below JSON format of json_data from SAP Analytics Cloud. Only answer compact pyodide python code <code> to determine the answer to further questions. I will myself pass it to exec(<code>, {'json_data', json.loads(json_data)}).\n\nHere, json_data looks like " + JSON.stringify(this.sampleSet).slice(0, -1) + ", ...]";
+                var instructions = "You are my laconic python developer. Refer to below JSON format of json_data from SAP Analytics Cloud. Only answer compact pyodide python code <code> to determine the answer to further questions. I will myself pass it to exec(<code>, {'json_data', json.loads(json_data)}).\n\nHere, json_data looks like " + JSON.stringify(this.sampleSet).slice(0, -1) + ", ...]" + "\n\nAlways answer with a python <code>, even for conversational questions, storing the final result in variable 'output' as a descriptive string understandable to business users.";
                 instructions = instructions.replace(regex_quote, "\\\"");
                 var firstMessage = '{"role": "system", "content": "' + instructions + '"}';
                 var messageObject = JSON.parse(firstMessage.replace(regex_newline, "\\\\n"));
                 messageArray.push(messageObject);
 
-                instructions = "Always answer with a python <code>, even for conversational questions, storing the final result in variable 'output' as a descriptive string understandable to business users.";
+                instructions = "Answer to conversational questions too in python code storing your answer in string variable 'output'.";
                 instructions = instructions.replace(regex_quote, "\\\"");
                 firstMessage = '{"role": "user", "content": "' + instructions + '"}';
                 messageObject = JSON.parse(firstMessage.replace(regex_newline, "\\\\n"));
@@ -291,7 +291,7 @@ const url = "https://api.openai.com/v1";
                 return codeOutput;
             } catch (error) {
                 console.error("Your query could not be processed. Please try to reformulate your question.", error);
-                return "Your query could not be processed. Please try to reformulate your question";
+                return "Your query could not be processed. Please try to reformulate your question.";
             }
         }
     }
