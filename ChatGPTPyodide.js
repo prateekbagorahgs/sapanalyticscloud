@@ -185,7 +185,7 @@ const url = "https://api.openai.com/v1";
 
                 // Managing conversation history to maintain session
                 // The first message contains dataset in JSON format and instructions to ChatGPT
-                var instructions = "You are my laconic python developer. Refer to below JSON format of multi-dimensional json_data from SAP Analytics Cloud. Only answer compact pyodide python code <code> to answer with aggregated results to further questions. I will myself pass it to exec(<code>, {'json_data', json.loads(json_data)}).";
+                var instructions = "You are my laconic python developer. Refer to below JSON format of multi-dimensional json_data from SAP Analytics Cloud. Only answer compact pyodide python code <code> to answer to further questions with results aggregated across all dimensions. I will myself pass it to exec(<code>, {'json_data', json.loads(json_data)}).";
                 instructions = instructions.replace(regex_quote, "\\\"");
                 var firstMessage = '{"role": "system", "content": "' + instructions + '"}';
                 var messageObject = JSON.parse(firstMessage.replace(regex_newline, "\\\\n"));
